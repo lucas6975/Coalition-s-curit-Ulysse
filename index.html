@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#eceef1">
+<title>Sécurité Coalition</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eceef1; --ink:#15171a; --yellow:#f5c342; --card:#fff; --muted:#5b6270; --line:#d6d9df;
+  --commune:#8a919e; --rare:#2f6fe0; --epique:#8a3fd1; --legendaire:#e8a600;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:'Barlow',system-ui,sans-serif}
+h1,h2,h3,.cond{font-family:'Barlow Condensed',sans-serif;font-weight:800;letter-spacing:.2px}
+.wrap{max-width:520px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 16px) 16px 40px}
+button{font-family:inherit;cursor:pointer}
+
+/* header */
+.head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.logo{width:52px;height:52px;border-radius:12px;flex:none;background:
+  repeating-linear-gradient(135deg,var(--yellow) 0 10px,#15171a 10px 20px);display:grid;place-items:center}
+.logo span{background:#fff;border-radius:50%;width:26px;height:26px;display:grid;place-items:center;font-size:15px}
+.head h1{margin:0;font-size:30px;line-height:1}
+.head small{color:var(--muted);font-size:15px}
+.who{margin-left:auto;font-size:13px;color:var(--muted);text-align:right}
+.who button{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:13px;padding:0}
+
+.tabs{display:flex;gap:10px;margin:14px 0 18px}
+.tab{flex:1;padding:14px 8px;border-radius:14px;border:2px solid var(--line);background:#fff;
+  font-family:'Barlow Condensed';font-weight:800;font-size:20px}
+.tab.on{background:var(--yellow);border-color:var(--yellow)}
+
+.progress{height:10px;background:#dfe2e8;border-radius:99px;overflow:hidden;margin:6px 0 4px}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--yellow),#e8a600);width:0;transition:width .6s}
+
+/* pack */
+.packstage{display:grid;place-items:center;padding:10px 0 6px;perspective:900px}
+.cardback{
+  width:min(62vw,270px);aspect-ratio:5/7;border-radius:22px;border:7px solid #15171a;position:relative;overflow:hidden;
+  background:repeating-linear-gradient(135deg,var(--yellow) 0 22px,#15171a 22px 44px);
+  box-shadow:0 14px 30px rgba(0,0,0,.25);transform:rotate(-2deg);transition:transform .3s}
+.cardback .in{position:absolute;inset:16px;border-radius:16px;background:#15171a;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;padding:8px 8px 18px;text-align:center}
+.cardback img,.cardback svg.mascot{width:78%;max-height:58%;object-fit:contain;margin-bottom:6px}
+.cardback h2{margin:0;color:var(--yellow);font-size:clamp(34px,10vw,46px);line-height:.92}
+.cardback p{margin:6px 0 0;color:#fff;font-weight:600;font-size:15px}
+.cardback.shake{animation:shake .5s}
+@keyframes shake{0%,100%{transform:rotate(-2deg)}25%{transform:rotate(4deg) scale(1.03)}75%{transform:rotate(-6deg) scale(1.03)}}
+
+.btn{display:block;width:100%;padding:16px;border-radius:16px;border:0;background:var(--yellow);
+  font-family:'Barlow Condensed';font-weight:800;font-size:24px;margin-top:16px}
+.btn:disabled{background:#d0d4db;color:#6b7280}
+.btn.ghost{background:#fff;border:2px solid var(--line);font-size:20px;padding:13px}
+.hint{text-align:center;color:var(--muted);margin:10px 0 0}
+
+/* cards */
+.card{position:relative;border-radius:16px;background:#fff;border:4px solid var(--c,#999);overflow:hidden;
+  display:flex;flex-direction:column;aspect-ratio:5/7;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.card .top{background:var(--c);color:#fff;display:flex;justify-content:space-between;align-items:center;
+  padding:4px 8px;font-family:'Barlow Condensed';font-weight:800;font-size:13px;text-transform:uppercase}
+.card .art{flex:1;display:grid;place-items:center;font-size:46px;
+  background:linear-gradient(180deg,color-mix(in srgb,var(--c) 14%,#fff),#fff)}
+.card .name{padding:2px 6px 8px;text-align:center;font-family:'Barlow Condensed';font-weight:800;font-size:16px;line-height:1.05}
+.card.legendaire{box-shadow:0 0 0 2px #fff,0 0 18px 4px rgba(232,166,0,.55)}
+.card.legendaire::after,.card.epique::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+  background-size:250% 100%;animation:shine 3s infinite}
+@keyframes shine{from{background-position:150% 0}to{background-position:-100% 0}}
+.card.locked{filter:grayscale(1);opacity:.55}
+.card.locked .art{font-size:34px;color:#9aa1ad}
+.badge{position:absolute;top:26px;right:6px;background:#15171a;color:#fff;border-radius:99px;font-size:12px;font-weight:700;padding:1px 7px}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rar-commune{--c:var(--commune)}.rar-rare{--c:var(--rare)}.rar-epique{--c:var(--epique)}.rar-legendaire{--c:var(--legendaire)}
+
+/* reveal */
+.reveal{position:fixed;inset:0;background:rgba(15,17,20,.92);z-index:50;display:none;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px}
+.reveal.on{display:flex}
+.reveal .flip{width:min(70vw,300px);perspective:1000px}
+.reveal .card{font-size:1.4em;animation:pop .45s}
+@keyframes pop{from{transform:rotateY(90deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.reveal .card .name{font-size:24px}
+.reveal .card .art{font-size:80px}
+.explain{background:#fff;border-radius:16px;padding:14px 16px;margin-top:16px;max-width:420px;width:100%}
+.explain h3{margin:0 0 4px;font-size:24px}
+.explain p{margin:4px 0;line-height:1.4}
+.explain .tip{background:#fff7dc;border-left:5px solid var(--yellow);padding:8px 10px;border-radius:8px;margin-top:8px;font-weight:500}
+.rbtns{display:flex;gap:10px;width:100%;max-width:420px}
+.rbtns .btn{margin-top:12px}
+.counter{color:#fff;margin-bottom:10px;font-weight:600}
+.newtag{color:var(--yellow);font-family:'Barlow Condensed';font-weight:800;font-size:22px;margin-bottom:8px}
+
+/* auth + misc */
+.panel{background:#fff;border-radius:18px;padding:18px;border:1px solid var(--line)}
+input{width:100%;padding:14px;border:2px solid var(--line);border-radius:12px;font-size:17px;margin:6px 0 10px;font-family:inherit}
+label{font-weight:600;font-size:14px}
+.err{color:#c0392b;font-weight:600;min-height:20px}
+.lb{list-style:none;padding:0;margin:0}
+.lb li{display:flex;gap:10px;align-items:center;padding:12px;background:#fff;border-radius:12px;margin-bottom:8px;border:1px solid var(--line)}
+.lb b{font-family:'Barlow Condensed';font-size:22px;width:28px}
+.lb .n{flex:1;font-weight:600}
+.note{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.4}
+.hidden{display:none!important}
+.modalsel{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<div class="reveal" id="reveal"></div>
+
+<script>
+/* =========================================================
+   SÉCURITÉ COALITION – application de cartes sécurité
+   ⚠ Adaptez les textes aux règles réelles de votre site.
+   ========================================================= */
+
+const COVER_IMG = "ulysse.png";          // photo de la mascotte (à déposer à côté de index.html)
+const PACK_SIZE = 5;                       // 5 à 10 cartes par pack
+const TOTAL_DAYS = 30;                     // durée de l'opération
+const RARITY = {
+  commune:    {label:"Commune",    w:55},
+  rare:       {label:"Rare",       w:28},
+  epique:     {label:"Épique",     w:13},
+  legendaire: {label:"Légendaire", w:4}
+};
+
+/* ---------- LES 30 CARTES ---------- */
+const CARDS = [
+ {id:1, n:"LSR Michelin", r:"legendaire", e:"❤️‍🩹", t:"Les Life Saving Rules",
+  d:"Les règles qui sauvent (LSR) sont des règles vitales non négociables. Elles visent les situations où une erreur peut être mortelle ou causer un accident grave.",
+  tip:"Une règle vitale ne se discute pas : en cas de doute, j'arrête et j'alerte."},
+ {id:2, n:"Issue de secours", r:"epique", e:"🚪", t:"Toujours dégagée",
+  d:"Les issues de secours doivent rester libres et déverrouillées pendant la présence du personnel. Elles permettent d'évacuer rapidement en cas d'incendie ou d'alerte.",
+  tip:"Aucun stockage, même 5 minutes, devant une issue de secours."},
+ {id:3, n:"DUERP", r:"epique", e:"📘", t:"Document Unique d'Évaluation des Risques Professionnels",
+  d:"Le DUERP recense les risques de chaque unité de travail et les actions de prévention. Il est obligatoire et doit être mis à jour au moins une fois par an.",
+  tip:"Vous repérez un risque absent du DUERP ? Signalez-le à votre responsable."},
+ {id:4, n:"Casque de sécurité", r:"rare", e:"⛑️", t:"ÉPI – Protection de la tête",
+  d:"Le casque protège contre les chutes d'objets et les chocs. Il a une durée de vie limitée et doit être remplacé après un choc important.",
+  tip:"Jugulaire ajustée et date de fabrication vérifiée."},
+ {id:5, n:"Chaussures de sécurité", r:"rare", e:"🥾", t:"ÉPI – Protection des pieds",
+  d:"Embout de protection, semelle antidérapante et anti-perforation : elles réduisent les risques d'écrasement, de glissade et de coupure.",
+  tip:"Une chaussure abîmée ne protège plus : remplacez-la."},
+ {id:6, n:"Gants adaptés", r:"rare", e:"🧤", t:"ÉPI – Protection des mains",
+  d:"Il n'existe pas de gant universel : coupure, chimique, chaleur ou électricité demandent chacun un gant spécifique.",
+  tip:"Vérifiez le pictogramme et la norme sur le gant avant la tâche."},
+ {id:7, n:"Lunettes de protection", r:"rare", e:"🥽", t:"ÉPI – Protection des yeux",
+  d:"Projections, poussières, éclats ou produits chimiques : les lunettes ou la visière protègent des lésions oculaires souvent irréversibles.",
+  tip:"Les lunettes de vue ne remplacent pas des lunettes de protection."},
+ {id:8, n:"Protections auditives", r:"rare", e:"🎧", t:"ÉPI – Protection de l'ouïe",
+  d:"Une exposition prolongée au bruit entraîne une perte d'audition définitive. Bouchons ou casque sont obligatoires dans les zones signalées.",
+  tip:"Le bruit ne se voit pas : portez-les avant d'entrer en zone."},
+ {id:9, n:"Gilet haute visibilité", r:"rare", e:"🦺", t:"ÉPI – Être vu",
+  d:"Le gilet jaune rend visible les piétons près des engins et véhicules. Il doit être propre, fermé et porté dans les zones de circulation.",
+  tip:"Être vu, c'est la première protection."},
+ {id:10, n:"Extincteur", r:"rare", e:"🧯", t:"Premiers secours incendie",
+  d:"Repérez les extincteurs et leur type (eau, CO₂, poudre) selon le feu. On attaque un feu naissant, à la base des flammes, dos à la sortie.",
+  tip:"Ne combattez jamais un feu que vous ne maîtrisez pas : évacuez et alertez."},
+ {id:11, n:"Point de rassemblement", r:"rare", e:"📍", t:"Après l'évacuation",
+  d:"En cas d'alarme, on rejoint le point de rassemblement pour permettre le comptage. Personne ne retourne dans le bâtiment avant l'autorisation officielle.",
+  tip:"Connaissez dès aujourd'hui l'emplacement de votre point de rassemblement."},
+ {id:12, n:"Consignation LOTO", r:"epique", e:"🔒", t:"Lock Out – Tag Out",
+  d:"Avant d'intervenir sur une machine, on coupe, on verrouille, on étiquette et on vérifie l'absence d'énergie. Chacun pose son propre cadenas.",
+  tip:"Mon cadenas, ma clé, ma vie."},
+ {id:13, n:"Travail en hauteur", r:"epique", e:"🪜", t:"Prévenir les chutes",
+  d:"Les chutes de hauteur sont l'une des premières causes d'accidents graves. On privilégie les protections collectives avant le harnais.",
+  tip:"Vérifiez l'état de l'échelle ou de l'échafaudage avant chaque usage."},
+ {id:14, n:"Plan de prévention", r:"rare", e:"🤝", t:"Co-activité entreprises extérieures",
+  d:"Quand une entreprise extérieure intervient sur site, les risques sont analysés ensemble et formalisés dans un plan de prévention.",
+  tip:"Accueillez et informez systématiquement les intervenants extérieurs."},
+ {id:15, n:"Piétons et engins", r:"rare", e:"🚜", t:"Séparer les flux",
+  d:"Les piétons et les engins de manutention doivent circuler sur des voies séparées. Aux croisements, on s'arrête et on établit un contact visuel avec le cariste.",
+  tip:"Si je ne vois pas le conducteur, il ne me voit pas."},
+ {id:16, n:"Port de charges", r:"commune", e:"📦", t:"Prévenir les TMS",
+  d:"Dos droit, jambes fléchies, charge près du corps. Au-delà de la limite recommandée, on utilise une aide à la manutention ou on se fait aider.",
+  tip:"Pas de torsion du dos en portant : on pivote avec les pieds."},
+ {id:17, n:"Échauffement", r:"commune", e:"🤸", t:"Préparer son corps",
+  d:"Quelques minutes d'étirements et de mobilisation avant la prise de poste réduisent les risques de douleurs articulaires et musculaires.",
+  tip:"5 minutes d'échauffement valent mieux que des semaines d'arrêt."},
+ {id:18, n:"Produits chimiques", r:"rare", e:"🧪", t:"Lire l'étiquette et la FDS",
+  d:"Chaque produit possède une étiquette et une Fiche de Données de Sécurité. On ne transvase jamais dans un contenant non étiqueté et on ne mélange pas.",
+  tip:"En cas de doute sur un produit, ne l'utilisez pas."},
+ {id:19, n:"Pictogrammes CLP", r:"commune", e:"☣️", t:"Savoir les reconnaître",
+  d:"Les losanges rouges alertent sur les dangers : inflammable, corrosif, toxique, nocif pour la santé ou l'environnement, comburant, explosif…",
+  tip:"Un losange rouge = une précaution à connaître avant d'ouvrir."},
+ {id:20, n:"Presque-accident", r:"commune", e:"⚠️", t:"Signaler pour prévenir",
+  d:"Un presque-accident est un événement qui aurait pu blesser quelqu'un. Le déclarer permet de corriger la situation avant le vrai accident.",
+  tip:"Déclarer n'est pas dénoncer : c'est protéger ses collègues."},
+ {id:21, n:"Droit de retrait", r:"epique", e:"✋", t:"Danger grave et imminent",
+  d:"Un salarié peut se retirer d'une situation de travail dont il a un motif raisonnable de penser qu'elle présente un danger grave et imminent, et doit alerter son employeur.",
+  tip:"Dans le doute, je m'arrête et j'alerte mon responsable."},
+ {id:22, n:"Arrêt d'urgence", r:"rare", e:"🛑", t:"Connaître son emplacement",
+  d:"Chaque machine dispose d'un arrêt d'urgence accessible. Il doit rester dégagé et être testé régulièrement.",
+  tip:"Repérez-le avant de démarrer, pas pendant l'incident."},
+ {id:23, n:"Permis de feu", r:"epique", e:"🔥", t:"Travaux par points chauds",
+  d:"Soudage, meulage ou découpe peuvent déclencher un incendie. Le permis de feu définit les mesures à prendre avant, pendant et après les travaux.",
+  tip:"Surveillance maintenue après la fin des travaux."},
+ {id:24, n:"Espace confiné", r:"epique", e:"🕳️", t:"Cuves, fosses, réservoirs",
+  d:"Atmosphère pauvre en oxygène ou toxique : on ne rentre jamais seul. Mesure de l'air, surveillant extérieur et moyen de secours sont indispensables.",
+  tip:"Ne vous précipitez jamais pour secourir : alertez d'abord."},
+ {id:25, n:"Ordre et propreté", r:"commune", e:"🧹", t:"5S : un poste rangé est plus sûr",
+  d:"Câbles au sol, déchets, flaques d'huile : un poste en ordre limite les chutes de plain-pied, première cause d'accidents.",
+  tip:"Je vois un obstacle, je le retire ou je le signale."},
+ {id:26, n:"Sécurité routière", r:"commune", e:"🚗", t:"Sur la route comme au travail",
+  d:"Respect des limitations, ceinture, pas de téléphone au volant et pause toutes les 2 heures : les trajets sont un risque professionnel majeur.",
+  tip:"Aucun message ne justifie un accident."},
+ {id:27, n:"Sauveteur Secouriste", r:"rare", e:"🩹", t:"SST : les bons réflexes",
+  d:"Protéger, alerter, secourir. Le Sauveteur Secouriste du Travail agit dans l'attente des secours pour limiter les conséquences d'un accident.",
+  tip:"Connaissez le numéro d'urgence interne de votre site."},
+ {id:28, n:"Défibrillateur (DAE)", r:"rare", e:"🫀", t:"Chaque minute compte",
+  d:"En cas d'arrêt cardiaque, masser et défibriller rapidement multiplie fortement les chances de survie. Le DAE guide l'utilisateur par la voix.",
+  tip:"Sachez où est le DAE le plus proche de votre poste."},
+ {id:29, n:"Ergonomie du poste", r:"commune", e:"🪑", t:"Régler pour mieux travailler",
+  d:"Écran à hauteur des yeux, siège réglé, plan de travail adapté : un poste bien réglé évite les douleurs et la fatigue.",
+  tip:"Changez de position et faites des micro-pauses."},
+ {id:30, n:"Coalition sécurité", r:"legendaire", e:"🛡️", t:"Tous acteurs de la sécurité",
+  d:"La sécurité est l'affaire de tous : on se protège, on protège les autres et on ose alerter. Ensemble, zéro accident.",
+  tip:"Je suis acteur de ma sécurité et de celle de mes collègues."}
+];
+
+/* ---------- STOCKAGE LOCAL (démo, sur l'appareil) ---------- */
+const DB = {
+  get users(){ try{return JSON.parse(localStorage.getItem("sc_users")||"{}")}catch(e){return {}} },
+  set users(v){ try{localStorage.setItem("sc_users",JSON.stringify(v))}catch(e){} },
+  get session(){ try{return localStorage.getItem("sc_session")}catch(e){return null} },
+  set session(v){ try{ v?localStorage.setItem("sc_session",v):localStorage.removeItem("sc_session") }catch(e){} }
+};
+const today = () => new Date().toISOString().slice(0,10);
+const me = () => DB.users[DB.session];
+const save = u => { const all = DB.users; all[u.id]=u; DB.users = all; };
+
+/* ---------- TIRAGE ---------- */
+function drawCard(){
+  const total = Object.values(RARITY).reduce((a,b)=>a+b.w,0);
+  let x = Math.random()*total, rar="commune";
+  for(const k in RARITY){ x -= RARITY[k].w; if(x<=0){ rar=k; break; } }
+  const pool = CARDS.filter(c=>c.r===rar);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+function drawPack(){ return Array.from({length:PACK_SIZE},drawCard); }
+
+/* ---------- VUES ---------- */
+const app = document.getElementById("app");
+let tab = "pack";
+
+function mascot(){
+  return `<img src="${COVER_IMG}" alt="Ulysse" onerror="this.replaceWith(fallbackMascot())">`;
+}
+function fallbackMascot(){
+  const s = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  s.setAttribute("viewBox","0 0 100 100"); s.setAttribute("class","mascot");
+  s.innerHTML = '<circle cx="50" cy="30" r="16" fill="#f4b58c"/><rect x="30" y="48" width="40" height="40" rx="8" fill="#f5e000"/><path d="M30 48 L10 90 L50 80 L90 90 L70 48Z" fill="#e6d200" opacity=".6"/>';
+  return s;
+}
+
+function header(u){
+  const n = Object.keys(u.cards).length;
+  return `
+  <div class="head">
+    <div class="logo"><span>🛡️</span></div>
+    <div><h1>Sécurité Coalition</h1><small>${n}/${CARDS.length} cartes collectionnées</small></div>
+    <div class="who">${u.name}<br><button onclick="logout()">Déconnexion</button></div>
+  </div>
+  <div class="progress"><i style="width:${n/CARDS.length*100}%"></i></div>
+  <div class="tabs">
+    <button class="tab ${tab==='pack'?'on':''}" onclick="go('pack')">Pack du jour</button>
+    <button class="tab ${tab==='coll'?'on':''}" onclick="go('coll')">Collection</button>
+    <button class="tab ${tab==='rank'?'on':''}" onclick="go('rank')">Classement</button>
+  </div>`;
+}
+
+function cardHTML(c, count){
+  return `<div class="card rar-${c.r} ${c.r}">
+    <div class="top"><span>${RARITY[c.r].label}</span><span>#${String(c.id).padStart(2,"0")}</span></div>
+    ${count>1?`<span class="badge">x${count}</span>`:""}
+    <div class="art">${c.e}</div>
+    <div class="name">${c.n}</div>
+  </div>`;
+}
+
+function render(){
+  const u = me();
+  if(!u){ return renderAuth(); }
+  let html = header(u);
+  if(tab==="pack") html += viewPack(u);
+  if(tab==="coll") html += viewColl(u);
+  if(tab==="rank") html += viewRank(u);
+  app.innerHTML = html;
+}
+
+function viewPack(u){
+  const opened = u.lastPack === today();
+  const complete = Object.keys(u.cards).length === CARDS.length;
+  return `
+  <div class="packstage"><div class="cardback" id="pack">
+    <div class="in">${mascot()}<h2>PACK<br>DU JOUR</h2><p>${PACK_SIZE} cartes sécurité</p></div>
+  </div></div>
+  <button class="btn" ${opened?"disabled":""} onclick="openPack(false)">${opened?"Pack du jour ouvert":"Ouvrir mon pack"}</button>
+  <p class="hint">${opened?"Revenez demain pour un nouveau pack.":"Un nouveau pack chaque jour !"}</p>
+  <button class="btn ghost" onclick="openPack(true)">Pack bonus (démo)</button>
+  ${complete?`<div class="panel" style="margin-top:16px"><h3 class="cond">🏆 Collection complète !</h3>
+  <p>Terminée le ${new Date(u.completedAt).toLocaleString("fr-FR")}. Rendez-vous auprès de l'organisateur pour votre lot.</p></div>`:""}`;
+}
+
+function viewColl(u){
+  const html = CARDS.map(c=>{
+    const k = u.cards[c.id];
+    return k
+      ? `<div onclick="showCard(${c.id})">${cardHTML(c,k)}</div>`
+      : `<div class="card locked rar-${c.r}"><div class="top"><span>?</span><span>#${String(c.id).padStart(2,"0")}</span></div>
+         <div class="art">❔</div><div class="name">À découvrir</div></div>`;
+  }).join("");
+  return `<div class="grid">${html}</div>
+  <p class="note">Touchez une carte pour relire l'explication.</p>`;
+}
+
+function viewRank(u){
+  const list = Object.values(DB.users).map(x=>({name:x.name,n:Object.keys(x.cards).length,at:x.completedAt||0}))
+    .sort((a,b)=> b.n-a.n || (a.at||9e15)-(b.at||9e15));
+  return `<ul class="lb">${list.map((x,i)=>`<li><b>${i+1}</b><span class="n">${x.name}</span><span>${x.n}/${CARDS.length}${x.n===CARDS.length?" 🏆":""}</span></li>`).join("")}</ul>
+  <p class="note">Classement local à cet appareil (démo). Pour un vrai classement entre collègues et désigner le premier à terminer, il faut une base de données partagée (voir le guide).</p>`;
+}
+
+/* ---------- AUTH (démo locale) ---------- */
+function renderAuth(mode="login", err=""){
+  app.innerHTML = `
+  <div class="head"><div class="logo"><span>🛡️</span></div><div><h1>Sécurité Coalition</h1><small>Connectez-vous pour ouvrir votre pack</small></div></div>
+  <div class="panel">
+    <label>Prénom et nom</label><input id="nm" placeholder="Ex : Julie Martin" autocomplete="name">
+    <label>Code personnel (4 chiffres)</label><input id="pin" inputmode="numeric" maxlength="4" type="password" placeholder="••••">
+    <div class="err" id="err">${err}</div>
+    <button class="btn" style="margin-top:0" onclick="auth('${mode}')">${mode==="login"?"Se connecter":"Créer mon compte"}</button>
+    <button class="btn ghost" onclick="renderAuth('${mode==="login"?"signup":"login"}')">${mode==="login"?"Créer un compte":"J'ai déjà un compte"}</button>
+  </div>
+  <p class="note">Démo : les comptes sont stockés sur cet appareil uniquement.</p>`;
+}
+function auth(mode){
+  const name = document.getElementById("nm").value.trim();
+  const pin = document.getElementById("pin").value.trim();
+  if(!name || !/^\d{4}$/.test(pin)) return renderAuth(mode,"Nom et code à 4 chiffres requis.");
+  const id = name.toLowerCase().replace(/\s+/g," ");
+  const all = DB.users;
+  if(mode==="signup"){
+    if(all[id]) return renderAuth(mode,"Ce nom existe déjà.");
+    all[id] = {id,name,pin,cards:{},lastPack:null,completedAt:null}; DB.users = all;
+  } else if(!all[id] || all[id].pin!==pin){
+    return renderAuth(mode,"Nom ou code incorrect.");
+  }
+  DB.session = id; tab="pack"; render();
+}
+function logout(){ DB.session=null; render(); }
+function go(t){ tab=t; render(); }
+
+/* ---------- OUVERTURE ---------- */
+let queue=[], qi=0;
+function openPack(bonus){
+  const u = me();
+  if(!bonus && u.lastPack===today()) return;
+  const pack = drawPack();
+  const packEl = document.getElementById("pack");
+  packEl.classList.add("shake");
+  setTimeout(()=>{
+    queue = pack.map(c=>({c, isNew: !u.cards[c.id]}));
+    pack.forEach(c=>{ u.cards[c.id]=(u.cards[c.id]||0)+1; });
+    if(!bonus) u.lastPack = today();
+    if(!u.completedAt && Object.keys(u.cards).length===CARDS.length) u.completedAt = Date.now();
+    save(u); qi=0; showReveal();
+  },500);
+}
+function showReveal(){
+  const el = document.getElementById("reveal");
+  if(qi>=queue.length){ el.classList.remove("on"); render(); return; }
+  const {c,isNew} = queue[qi], u=me();
+  el.innerHTML = `
+    <div class="counter">Carte ${qi+1} / ${queue.length}</div>
+    ${isNew?'<div class="newtag">✨ NOUVELLE CARTE</div>':'<div class="newtag" style="color:#bbb">Doublon</div>'}
+    <div class="flip">${cardHTML(c,0)}</div>
+    <div class="explain"><h3>${c.t}</h3><p>${c.d}</p><div class="tip">💡 ${c.tip}</div></div>
+    <div class="rbtns"><button class="btn" onclick="qi++;showReveal()">${qi+1===queue.length?"Terminer":"Carte suivante"}</button></div>`;
+  el.classList.add("on");
+}
+function showCard(id){
+  const c = CARDS.find(x=>x.id===id);
+  queue=[{c,isNew:false}]; qi=0; showReveal();
+  document.querySelector("#reveal .newtag").remove();
+  document.querySelector("#reveal .counter").remove();
+}
+render();
+</script>
+</body>
+</html>
